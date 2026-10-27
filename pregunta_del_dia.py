@@ -3,7 +3,7 @@ Pregunta del día · Prolince → canal de Telegram
 Publica una encuesta tipo «quiz» por ejecución, alternando los bancos de
 conocimientos, inglés, gramática y ortografía (CSV de la web, separador ;).
 
-Bancos en la carpeta bancos/ (si hay varias versiones, usa la más reciente):
+Bancos en la carpeta banco_telegram/ (si hay varias versiones, usa la más reciente):
   banco-unificado_Acceso-GC*.csv  -> conocimientos
   Banco_Ingles_GC*.csv            -> inglés
   Banco_Gramatica_GC*.csv         -> gramática
@@ -19,7 +19,7 @@ import csv, glob, json, os, random, re, sys, urllib.request
 
 TOKEN = os.environ["TELEGRAM_TOKEN"]
 CHAT = os.environ["TELEGRAM_CHAT"]
-CARPETA = os.environ.get("CARPETA_BANCOS", "bancos")
+CARPETA = os.environ.get("CARPETA_BANCOS", "banco_telegram")
 ESTADO = "estado.json"
 
 BANCOS = {

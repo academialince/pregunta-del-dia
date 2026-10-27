@@ -15,18 +15,20 @@ Variables de entorno:
   ROTACION        orden de bancos, una entrada por publicación (opcional)
   BANCO           fuerza un banco concreto en esta ejecución (opcional)
 """
-import csv, glob, json, os, random, re, sys, urllib.request
+import csv, glob, json, os, random, re, sys, unicodedata, urllib.request
 
 TOKEN = os.environ["TELEGRAM_TOKEN"]
 CHAT = os.environ["TELEGRAM_CHAT"]
 CARPETA = os.environ.get("CARPETA_BANCOS", "banco_telegram")
 ESTADO = "estado.json"
 
+# Cada banco se reconoce por palabras en el nombre del archivo (sin importar
+# mayúsculas, tildes, guiones o espacios).
 BANCOS = {
-    "conocimientos": ("banco-unificado_Acceso-GC*.csv", "📚 CONOCIMIENTOS"),
-    "ingles":        ("Banco_Ingles_GC*.csv",           "🇬🇧 INGLÉS"),
-    "gramatica":     ("Banco_Gramatica_GC*.csv",        "✍️ GRAMÁTICA"),
-    "ortografia":    ("Banco_Ortografia_GC*.csv",       "🔤 ORTOGRAFÍA"),
+    "conocimientos": (["unificado", "conocimiento", "temas"], "📚 CONOCIMIENTOS"),
+    "ingles":        (["ingles", "english"],                  "🇬🇧 INGLÉS"),
+    "gramatica":     (["gramatica"],                          "✍️ GRAMÁTICA"),
+    "ortografia":    (["ortografia"],                         "🔤 ORTOGRAFÍA"),
 }
 # Con 2 publicaciones al día: mañana siempre conocimientos y tarde rota
 # inglés → gramática → ortografía. Se cambia con la variable ROTACION.
@@ -55,11 +57,24 @@ def recortar(t, n):
     return t if len(t) <= n else t[: n - 1] + "…"
 
 
-def ruta_banco(patron):
-    fs = glob.glob(os.path.join(CARPETA, patron))
+def normal(t):
+    t = unicodedata.normalize("NFD", t.lower())
+    return "".join(c for c in t if unicodedata.category(c) != "Mn")
+
+
+def todos_los_csv():
+    return [p for p in glob.glob(os.path.join(CARPETA, "**", "*"), recursive=True)
+            if p.lower().endswith(".csv")]
+
+
+def ruta_banco(claves):
+    otros = {"historico", "oficial"}            # nunca usar el histórico de exámenes
+    fs = [p for p in todos_los_csv()
+          if any(k in normal(os.path.basename(p)) for k in claves)
+          and not any(o in normal(os.path.basename(p)) for o in otros)]
     if not fs:
         return None
-    version = lambda p: int((re.findall(r"_(\d+)\.csv$", p) or [0])[0])
+    version = lambda p: int((re.findall(r"(\d+)\.csv$", p, re.I) or [0])[0])
     return max(fs, key=lambda p: (version(p), os.path.getmtime(p)))
 
 
@@ -89,7 +104,11 @@ def main():
         if ruta:
             break
     else:
-        sys.exit(f"No encuentro ningún banco en {CARPETA}/")
+        vistos = todos_los_csv()
+        sys.exit(f"No encuentro ningún banco en {CARPETA}/. "
+                 f"Contenido de la carpeta {os.path.abspath(CARPETA)}: "
+                 f"{os.listdir(CARPETA) if os.path.isdir(CARPETA) else 'NO EXISTE'}. "
+                 f"CSV vistos: {vistos}. Carpetas en la raíz: {os.listdir('.')}")
 
     titulo = BANCOS[nombre][1]
     with open(ruta, encoding="utf-8-sig", newline="") as f:

@@ -81,7 +81,8 @@ def main():
         else {"turno": 0, "publicadas": {}}
 
     # banco de este turno (si falta el archivo, salta al siguiente de la rotación)
-    orden = [os.environ["BANCO"]] if os.environ.get("BANCO") else \
+    forzado = os.environ.get("BANCO", "").strip().lower()
+    orden = [forzado] if forzado in BANCOS else \
         [ROTACION[(estado["turno"] + i) % len(ROTACION)] for i in range(len(ROTACION))]
     for nombre in orden:
         ruta = ruta_banco(BANCOS[nombre][0])

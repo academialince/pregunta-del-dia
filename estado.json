@@ -1,8 +1,11 @@
 {
- "turno": 1,
+ "turno": 2,
  "publicadas": {
   "conocimientos": [
    "Ley Orgánica reguladora de la responsabilidad penal de los menores. Refundición de medidas impuestas. Una persona que cumple una medida de esta Ley es condenada a una pena del Código Penal y no es posible la ejecución simultánea. Como regla general:"
+  ],
+  "ingles": [
+   "There's a mirror _____ the wall, just _____ the sink."
   ]
  }
 }

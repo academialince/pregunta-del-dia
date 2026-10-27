@@ -1,4 +1,4 @@
-github/workflows/pregunta-del-dia.ymlname: Pregunta del día
+name: Pregunta del día
 on:
   schedule:
     - cron: "0 8 * * *"      # 09:00 en Madrid en invierno (10:00 en verano)
@@ -6,10 +6,16 @@ on:
   workflow_dispatch:
     inputs:
       banco:
-        description: "Forzar banco (vacío = rotación)"
+        description: "Banco a publicar"
         required: false
+        default: rotacion
         type: choice
-        options: ["", conocimientos, ingles, gramatica, ortografia]
+        options:
+          - rotacion
+          - conocimientos
+          - ingles
+          - gramatica
+          - ortografia
 permissions:
   contents: write
 concurrency: pregunta-del-dia

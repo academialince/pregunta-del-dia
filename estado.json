@@ -1,5 +1,5 @@
 {
- "turno": 5,
+ "turno": 6,
  "publicadas": {
   "conocimientos": [
    "Instituciones Internacionales. Organización del Tratado del Atlántico Norte. ¿Con qué frecuencia mínima se reúne el Consejo del Atlántico Norte?",
@@ -9,6 +9,9 @@
   ],
   "ingles": [
    "There's a mirror _____ the wall, just _____ the sink."
+  ],
+  "ortografia": [
+   "Ortografía. Señale las palabras o expresiones INCORRECTAS (marque solo las que estén mal escritas): «El ávido (1) usurero (2) exigía (3) un redito (4) exorbitante.»"
   ]
  }
 }

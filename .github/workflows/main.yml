@@ -1,8 +1,8 @@
 name: Pregunta del día
 on:
   schedule:
-    - cron: "0 8 * * *"      # 09:00 en Madrid en invierno (10:00 en verano)
-    - cron: "0 18 * * *"     # 19:00 en Madrid en invierno (20:00 en verano)
+    - cron: "50 8 * * *"     # sale hacia las 10:00 en Madrid (horario de invierno)
+    - cron: "50 17 * * *"    # sale hacia las 19:00 en Madrid (horario de invierno)
   workflow_dispatch:
     inputs:
       banco:

@@ -1,5 +1,5 @@
 {
- "turno": 7,
+ "turno": 8,
  "publicadas": {
   "conocimientos": [
    "Instituciones Internacionales. Organización del Tratado del Atlántico Norte. ¿Con qué frecuencia mínima se reúne el Consejo del Atlántico Norte?",
@@ -13,6 +13,9 @@
   ],
   "ortografia": [
    "Ortografía. Señale las palabras o expresiones INCORRECTAS (marque solo las que estén mal escritas): «El ávido (1) usurero (2) exigía (3) un redito (4) exorbitante.»"
+  ],
+  "gramatica": [
+   "Gramática. Señale si la frase o expresión es CORRECTA o INCORRECTA: «No sé dónde dejé las llaves.»"
   ]
  }
 }

@@ -14,8 +14,9 @@ Variables de entorno:
   TELEGRAM_CHAT   @canal o id numérico (-100...)
   ROTACION        orden de bancos, una entrada por publicación (opcional)
   BANCO           fuerza un banco concreto en esta ejecución (opcional)
+  CANTIDAD        preguntas por publicación (por defecto 3; cada una sigue la rotación)
 """
-import csv, glob, json, os, random, re, sys, unicodedata, urllib.request
+import csv, glob, json, os, random, re, sys, time, unicodedata, urllib.request
 
 TOKEN = os.environ["TELEGRAM_TOKEN"]
 CHAT = os.environ["TELEGRAM_CHAT"]
@@ -91,9 +92,7 @@ def valida(p, cabecera):
             and all(len(o) <= MAX_OPCION for _, o in ops))
 
 
-def main():
-    estado = json.load(open(ESTADO, encoding="utf-8")) if os.path.exists(ESTADO) \
-        else {"turno": 0, "publicadas": {}}
+def publicar_una(estado, n, total):
 
     # banco de este turno (si falta el archivo, salta al siguiente de la rotación)
     forzado = os.environ.get("BANCO", "").strip().lower()
@@ -117,7 +116,7 @@ def main():
     filas = [p for p in filas if limpiar(p.get("enunciado"))]
 
     hechas = set(estado["publicadas"].get(nombre, []))
-    cab_max = f"{titulo} · Tema 00 · 🎯 Ha caído en examen\n"
+    cab_max = f"0/0 · {titulo} · Tema 00 · 🎯 Ha caído en examen\n"
     candidatas = [p for p in filas if valida(p, cab_max)]
     pendientes = [p for p in candidatas if limpiar(p["enunciado"]) not in hechas]
     if not pendientes:                      # banco agotado: vuelve a empezar
@@ -133,7 +132,8 @@ def main():
         extra += f" · {tema if tema.lower().startswith('tema') else 'Tema ' + tema}"
     if "examen oficial" in (p["enunciado"] + p.get("explicacion", "")).lower():
         extra += " · 🎯 Ha caído en examen"
-    cabecera = f"{titulo}{extra}\n"
+    num = f"{n}/{total} · " if total > 1 else ""
+    cabecera = f"{num}{titulo}{extra}\n"
     pregunta = cabecera + recortar(p["enunciado"], MAX_PREGUNTA - len(cabecera))
 
     ops = opciones(p)
@@ -153,8 +153,22 @@ def main():
     hechas.add(limpiar(p["enunciado"]))
     estado["publicadas"][nombre] = sorted(hechas)
     estado["turno"] += 1
-    json.dump(estado, open(ESTADO, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
     print(f"[{nombre}] {os.path.basename(ruta)} → {p['enunciado'][:90]}")
+
+
+def main():
+    estado = json.load(open(ESTADO, encoding="utf-8")) if os.path.exists(ESTADO) \
+        else {"turno": 0, "publicadas": {}}
+    try:
+        total = max(1, min(10, int(os.environ.get("CANTIDAD", "3") or 3)))
+    except ValueError:
+        total = 3
+    for n in range(1, total + 1):
+        publicar_una(estado, n, total)
+        # guarda tras cada pregunta para no repetir aunque falle la siguiente
+        json.dump(estado, open(ESTADO, "w", encoding="utf-8"), ensure_ascii=False, indent=1)
+        if n < total:
+            time.sleep(2)
 
 
 if __name__ == "__main__":
